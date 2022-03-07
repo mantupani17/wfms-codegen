@@ -1,5 +1,6 @@
 /* eslint-disable no-unused-vars */
 const Service = require('./Service');
+const { permissions } = require('../models/')
 
 /**
 * Create permission
@@ -11,8 +12,9 @@ const Service = require('./Service');
 const createNewPermission = ({ permission }) => new Promise(
   async (resolve, reject) => {
     try {
+      const per_res = await permissions.create(permission);
       resolve(Service.successResponse({
-        permission,
+        per_res,
       }));
     } catch (e) {
       reject(Service.rejectResponse(
