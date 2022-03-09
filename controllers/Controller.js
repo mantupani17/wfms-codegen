@@ -12,6 +12,7 @@ class Controller {
     * send 200 and the payload as received in this method.
     */
     response.status(payload.code || 200);
+    console.log('Hello world')
     const responsePayload = payload.payload !== undefined ? payload.payload : payload;
     if (responsePayload instanceof Object) {
       response.json(responsePayload);
