@@ -16,6 +16,10 @@ const deletePermission = async (request, response) => {
   await Controller.handleRequest(request, response, service.deletePermission);
 };
 
+const getAllPermissionDetail = async (request, response) => {
+  await Controller.handleRequest(request, response, service.getAllPermissionDetail);
+};
+
 const getPermissionById = async (request, response) => {
   await Controller.handleRequest(request, response, service.getPermissionById);
 };
@@ -28,6 +32,7 @@ const updatePermission = async (request, response) => {
 module.exports = {
   createNewPermission,
   deletePermission,
+  getAllPermissionDetail,
   getPermissionById,
   updatePermission,
 };

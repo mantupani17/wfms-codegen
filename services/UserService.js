@@ -106,16 +106,14 @@ const getUserByName = ({ username }) => new Promise(
 /**
 * Logs user into the system
 *
-* username String The user name for login
-* password String The password for login in clear text
+* loginUser LoginUser 
 * returns String
 * */
-const loginUser = ({ username, password }) => new Promise(
+const loginUser = ({ loginUser }) => new Promise(
   async (resolve, reject) => {
     try {
       resolve(Service.successResponse({
-        username,
-        password,
+        loginUser,
       }));
     } catch (e) {
       reject(Service.rejectResponse(

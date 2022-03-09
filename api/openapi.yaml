@@ -34,7 +34,7 @@ paths:
         default:
           description: successful operation
       security:
-      - api_key: []
+      - bearerAuth: []
       summary: Create user
       tags:
       - user
@@ -48,7 +48,7 @@ paths:
         default:
           description: successful operation
       security:
-      - api_key: []
+      - bearerAuth: []
       summary: Creates list of users with given input array
       tags:
       - user
@@ -62,32 +62,32 @@ paths:
         default:
           description: successful operation
       security:
-      - api_key: []
+      - bearerAuth: []
       summary: Creates list of users with given input array
       tags:
       - user
       x-eov-operation-handler: controllers/UserController
   /user/login:
-    get:
+    post:
       operationId: loginUser
-      parameters:
-      - description: The user name for login
-        explode: true
-        in: query
-        name: username
+      requestBody:
+        $ref: '#/components/requestBodies/Login_User'
+        content:
+          application/json:
+            schema:
+              description: A User who is purchasing from the pet store
+              example:
+                username: username
+                password: password
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+              title: Login User
+              type: object
+        description: Login user
         required: true
-        schema:
-          pattern: ^[a-zA-Z0-9]+[a-zA-Z0-9\.\-_]*[a-zA-Z0-9]+$
-          type: string
-        style: form
-      - description: The password for login in clear text
-        explode: true
-        in: query
-        name: password
-        required: true
-        schema:
-          type: string
-        style: form
       responses:
         "200":
           content:
@@ -100,8 +100,8 @@ paths:
           description: successful operation
           headers:
             Set-Cookie:
-              description: Cookie authentication key for use with the `api_key` apiKey
-                authentication.
+              description: Cookie authentication key for use with the `bearerAuth`
+                apiKey authentication.
               explode: false
               schema:
                 example: AUTH_KEY=abcde12345; Path=/; HttpOnly
@@ -134,7 +134,7 @@ paths:
         default:
           description: successful operation
       security:
-      - api_key: []
+      - bearerAuth: []
       summary: Logs out current logged in user session
       tags:
       - user
@@ -158,7 +158,7 @@ paths:
         "404":
           description: User not found
       security:
-      - api_key: []
+      - bearerAuth: []
       summary: Delete user
       tags:
       - user
@@ -188,6 +188,8 @@ paths:
           description: Invalid username supplied
         "404":
           description: User not found
+        "401":
+          description: Access token is missing or invalid
       summary: Get user by user name
       tags:
       - user
@@ -216,8 +218,10 @@ paths:
           description: Invalid user supplied
         "404":
           description: User not found
+        "401":
+          description: Access token is missing or invalid
       security:
-      - api_key: []
+      - bearerAuth: []
       summary: Updated user
       tags:
       - user
@@ -237,7 +241,7 @@ paths:
         default:
           description: successful operation
       security:
-      - api_key: []
+      - bearerAuth: []
       summary: Create role
       tags:
       - role
@@ -260,8 +264,10 @@ paths:
           description: Invalid roleid supplied
         "404":
           description: roleid not found
+        "401":
+          description: Access token is missing or invalid
       security:
-      - api_key: []
+      - bearerAuth: []
       summary: Delete role
       tags:
       - role
@@ -291,6 +297,8 @@ paths:
           description: Invalid roleid supplied
         "404":
           description: role not found
+        "401":
+          description: Access token is missing or invalid
       summary: Get role by role id
       tags:
       - role
@@ -319,13 +327,49 @@ paths:
           description: Invalid role id supplied
         "404":
           description: role not found
+        "401":
+          description: Access token is missing or invalid
       security:
-      - api_key: []
+      - bearerAuth: []
       summary: Updated role
       tags:
       - role
       x-eov-operation-handler: controllers/RoleController
   /permission:
+    get:
+      description: This will get all the permission details
+      operationId: getAllPermissionDetail
+      parameters:
+      - description: The number of items to skip before starting to collect the result
+          set
+        explode: true
+        in: query
+        name: offset
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: The numbers of items to return
+        explode: true
+        in: query
+        name: limit
+        required: false
+        schema:
+          type: integer
+        style: form
+      responses:
+        "200":
+          description: successful operation
+        "400":
+          description: Invalid queries
+        "404":
+          description: permission not found
+        "401":
+          description: Access token is missing or invalid
+      summary: Get permissions by query
+      tags:
+      - permission
+      x-eov-operation-handler: controllers/PermissionController
     post:
       description: This can only be done by the superadmin user.
       operationId: createNewPermission
@@ -340,7 +384,7 @@ paths:
         default:
           description: successful operation
       security:
-      - api_key: []
+      - bearerAuth: []
       summary: Create permission
       tags:
       - permission
@@ -363,8 +407,10 @@ paths:
           description: Invalid permissionid supplied
         "404":
           description: permission not found
+        "401":
+          description: Access token is missing or invalid
       security:
-      - api_key: []
+      - bearerAuth: []
       summary: Delete role
       tags:
       - permission
@@ -394,6 +440,8 @@ paths:
           description: Invalid permissionid supplied
         "404":
           description: permission not found
+        "401":
+          description: Access token is missing or invalid
       summary: Get permission by id
       tags:
       - permission
@@ -422,8 +470,10 @@ paths:
           description: Invalid permission id supplied
         "404":
           description: permission not found
+        "401":
+          description: Access token is missing or invalid
       security:
-      - api_key: []
+      - bearerAuth: []
       summary: Updated permission
       tags:
       - permission
@@ -439,6 +489,15 @@ components:
             type: array
       description: List of user object
       required: true
+    Login_User:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Login_User'
+      required: true
+  responses:
+    UnauthorizedError:
+      description: Access token is missing or invalid
   schemas:
     User:
       description: A User who is purchasing from the pet store
@@ -578,16 +637,20 @@ components:
       xml:
         name: RolePermission
       x-eov-operation-handler: models/RolePermission
+    Login_User:
+      description: A User who is purchasing from the pet store
+      example:
+        username: username
+        password: password
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+      title: Login User
+      type: object
   securitySchemes:
-    wfms_auth:
-      flows:
-        implicit:
-          authorizationUrl: "null"
-          scopes:
-            write:permissions: modify permission in your account
-            read:permissions: read your permissions
-      type: oauth2
-    api_key:
-      in: header
-      name: api_key
-      type: apiKey
+    bearerAuth:
+      bearerFormat: JWT
+      scheme: bearer
+      type: http

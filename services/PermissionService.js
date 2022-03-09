@@ -46,6 +46,29 @@ const deletePermission = ({ permissionid }) => new Promise(
   },
 );
 /**
+* Get permissions by query
+* This will get all the permission details
+*
+* offset Integer The number of items to skip before starting to collect the result set (optional)
+* limit Integer The numbers of items to return (optional)
+* no response value expected for this operation
+* */
+const getAllPermissionDetail = ({ offset, limit }) => new Promise(
+  async (resolve, reject) => {
+    try {
+      resolve(Service.successResponse({
+        offset,
+        limit,
+      }));
+    } catch (e) {
+      reject(Service.rejectResponse(
+        e.message || 'Invalid input',
+        e.status || 405,
+      ));
+    }
+  },
+);
+/**
 * Get permission by id
 *
 * permissionid Integer The nanme that needs to be fetched.
@@ -92,6 +115,7 @@ const updatePermission = ({ permissionid, permission }) => new Promise(
 module.exports = {
   createNewPermission,
   deletePermission,
+  getAllPermissionDetail,
   getPermissionById,
   updatePermission,
 };
