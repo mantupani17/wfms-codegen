@@ -1,0 +1,656 @@
+openapi: 3.0.0
+info:
+  description: This yaml for generating the code for wfms project
+  license:
+    name: Apache-2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  title: OpenAPI WFML
+  version: 1.0.0
+externalDocs:
+  description: Find out more about Swagger
+  url: http://swagger.io
+servers:
+- url: http://localhost:3001
+tags:
+- description: Everything about users
+  name: user
+- description: Everything about different role
+  name: role
+- description: Everything about different permissions
+  name: permission
+paths:
+  /user:
+    post:
+      description: This can only be done by the logged in user.
+      operationId: createUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+        description: Created user object
+        required: true
+      responses:
+        default:
+          description: successful operation
+      security:
+      - bearerAuth: []
+      summary: Create user
+      tags:
+      - user
+      x-eov-operation-handler: controllers/UserController
+  /user/createWithArray:
+    post:
+      operationId: createUsersWithArrayInput
+      requestBody:
+        $ref: '#/components/requestBodies/UserArray'
+      responses:
+        default:
+          description: successful operation
+      security:
+      - bearerAuth: []
+      summary: Creates list of users with given input array
+      tags:
+      - user
+      x-eov-operation-handler: controllers/UserController
+  /user/createWithList:
+    post:
+      operationId: createUsersWithListInput
+      requestBody:
+        $ref: '#/components/requestBodies/UserArray'
+      responses:
+        default:
+          description: successful operation
+      security:
+      - bearerAuth: []
+      summary: Creates list of users with given input array
+      tags:
+      - user
+      x-eov-operation-handler: controllers/UserController
+  /user/login:
+    post:
+      operationId: loginUser
+      requestBody:
+        $ref: '#/components/requestBodies/Login_User'
+        content:
+          application/json:
+            schema:
+              description: A User who is purchasing from the pet store
+              example:
+                username: username
+                password: password
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+              title: Login User
+              type: object
+        description: Login user
+        required: true
+      responses:
+        "200":
+          content:
+            application/xml:
+              schema:
+                type: string
+            application/json:
+              schema:
+                type: string
+          description: successful operation
+          headers:
+            Set-Cookie:
+              description: Cookie authentication key for use with the `bearerAuth`
+                apiKey authentication.
+              explode: false
+              schema:
+                example: AUTH_KEY=abcde12345; Path=/; HttpOnly
+                type: string
+              style: simple
+            X-Rate-Limit:
+              description: calls per hour allowed by the user
+              explode: false
+              schema:
+                format: int32
+                type: integer
+              style: simple
+            X-Expires-After:
+              description: date in UTC when token expires
+              explode: false
+              schema:
+                format: date-time
+                type: string
+              style: simple
+        "400":
+          description: Invalid username/password supplied
+      summary: Logs user into the system
+      tags:
+      - user
+      x-eov-operation-handler: controllers/UserController
+  /user/logout:
+    get:
+      operationId: logoutUser
+      responses:
+        default:
+          description: successful operation
+      security:
+      - bearerAuth: []
+      summary: Logs out current logged in user session
+      tags:
+      - user
+      x-eov-operation-handler: controllers/UserController
+  /user/{username}:
+    delete:
+      description: This can only be done by the logged in user.
+      operationId: deleteUser
+      parameters:
+      - description: The name that needs to be deleted
+        explode: false
+        in: path
+        name: username
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "400":
+          description: Invalid username supplied
+        "404":
+          description: User not found
+      security:
+      - bearerAuth: []
+      summary: Delete user
+      tags:
+      - user
+      x-eov-operation-handler: controllers/UserController
+    get:
+      operationId: getUserByName
+      parameters:
+      - description: The name that needs to be fetched. Use user1 for testing.
+        explode: false
+        in: path
+        name: username
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/User'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: successful operation
+        "400":
+          description: Invalid username supplied
+        "404":
+          description: User not found
+        "401":
+          description: Access token is missing or invalid
+      summary: Get user by user name
+      tags:
+      - user
+      x-eov-operation-handler: controllers/UserController
+    put:
+      description: This can only be done by the logged in user.
+      operationId: updateUser
+      parameters:
+      - description: name that need to be deleted
+        explode: false
+        in: path
+        name: username
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+        description: Updated user object
+        required: true
+      responses:
+        "400":
+          description: Invalid user supplied
+        "404":
+          description: User not found
+        "401":
+          description: Access token is missing or invalid
+      security:
+      - bearerAuth: []
+      summary: Updated user
+      tags:
+      - user
+      x-eov-operation-handler: controllers/UserController
+  /role:
+    post:
+      description: This can only be done by the superadmin user.
+      operationId: createRole
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Role'
+        description: Created role object
+        required: true
+      responses:
+        default:
+          description: successful operation
+      security:
+      - bearerAuth: []
+      summary: Create role
+      tags:
+      - role
+      x-eov-operation-handler: controllers/RoleController
+  /role/{roleid}:
+    delete:
+      description: This can only be done by the superadmin.
+      operationId: deleteRole
+      parameters:
+      - description: The name that needs to be deleted
+        explode: false
+        in: path
+        name: roleid
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        "400":
+          description: Invalid roleid supplied
+        "404":
+          description: roleid not found
+        "401":
+          description: Access token is missing or invalid
+      security:
+      - bearerAuth: []
+      summary: Delete role
+      tags:
+      - role
+      x-eov-operation-handler: controllers/RoleController
+    get:
+      operationId: getRoleById
+      parameters:
+      - description: The id that needs to be fetched.
+        explode: false
+        in: path
+        name: roleid
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Role'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Role'
+          description: successful operation
+        "400":
+          description: Invalid roleid supplied
+        "404":
+          description: role not found
+        "401":
+          description: Access token is missing or invalid
+      summary: Get role by role id
+      tags:
+      - role
+      x-eov-operation-handler: controllers/RoleController
+    put:
+      description: This can only be done by the superadmin.
+      operationId: updateRole
+      parameters:
+      - description: name that need to be updated
+        explode: false
+        in: path
+        name: roleid
+        required: true
+        schema:
+          type: number
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Role'
+        description: Updated role details
+        required: true
+      responses:
+        "400":
+          description: Invalid role id supplied
+        "404":
+          description: role not found
+        "401":
+          description: Access token is missing or invalid
+      security:
+      - bearerAuth: []
+      summary: Updated role
+      tags:
+      - role
+      x-eov-operation-handler: controllers/RoleController
+  /permission:
+    get:
+      description: This will get all the permission details
+      operationId: getAllPermissionDetail
+      parameters:
+      - description: The number of items to skip before starting to collect the result
+          set
+        explode: true
+        in: query
+        name: offset
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: The numbers of items to return
+        explode: true
+        in: query
+        name: limit
+        required: false
+        schema:
+          type: integer
+        style: form
+      responses:
+        "200":
+          description: successful operation
+        "400":
+          description: Invalid queries
+        "404":
+          description: permission not found
+        "401":
+          description: Access token is missing or invalid
+      summary: Get permissions by query
+      tags:
+      - permission
+      x-eov-operation-handler: controllers/PermissionController
+    post:
+      description: This can only be done by the superadmin user.
+      operationId: createNewPermission
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Permission'
+        description: Created permission object
+        required: true
+      responses:
+        default:
+          description: successful operation
+      security:
+      - bearerAuth: []
+      summary: Create permission
+      tags:
+      - permission
+      x-eov-operation-handler: controllers/PermissionController
+  /permission/{permissionid}:
+    delete:
+      description: This can only be done by the superadmin.
+      operationId: deletePermission
+      parameters:
+      - description: The name that needs to be deleted
+        explode: false
+        in: path
+        name: permissionid
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        "400":
+          description: Invalid permissionid supplied
+        "404":
+          description: permission not found
+        "401":
+          description: Access token is missing or invalid
+      security:
+      - bearerAuth: []
+      summary: Delete role
+      tags:
+      - permission
+      x-eov-operation-handler: controllers/PermissionController
+    get:
+      operationId: getPermissionById
+      parameters:
+      - description: The nanme that needs to be fetched.
+        explode: false
+        in: path
+        name: permissionid
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Permission'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Permission'
+          description: successful operation
+        "400":
+          description: Invalid permissionid supplied
+        "404":
+          description: permission not found
+        "401":
+          description: Access token is missing or invalid
+      summary: Get permission by id
+      tags:
+      - permission
+      x-eov-operation-handler: controllers/PermissionController
+    put:
+      description: This can only be done by the superadmin.
+      operationId: updatePermission
+      parameters:
+      - description: name that need to be updated
+        explode: false
+        in: path
+        name: permissionid
+        required: true
+        schema:
+          type: number
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Permission'
+        description: Updated permission details
+        required: true
+      responses:
+        "400":
+          description: Invalid permission id supplied
+        "404":
+          description: permission not found
+        "401":
+          description: Access token is missing or invalid
+      security:
+      - bearerAuth: []
+      summary: Updated permission
+      tags:
+      - permission
+      x-eov-operation-handler: controllers/PermissionController
+components:
+  requestBodies:
+    UserArray:
+      content:
+        application/json:
+          schema:
+            items:
+              $ref: '#/components/schemas/User'
+            type: array
+      description: List of user object
+      required: true
+    Login_User:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Login_User'
+      required: true
+  responses:
+    UnauthorizedError:
+      description: Access token is missing or invalid
+  schemas:
+    User:
+      description: A User who is purchasing from the pet store
+      example:
+        firstName: firstName
+        lastName: lastName
+        password: password
+        userStatus: 6
+        phone: phone
+        id: 0
+        email: email
+        username: username
+      properties:
+        id:
+          format: int64
+          type: integer
+        username:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+        phone:
+          type: string
+        userStatus:
+          description: User Status
+          format: int32
+          type: integer
+      title: a User
+      type: object
+      xml:
+        name: User
+    UserRole:
+      description: User roles is the table which will kept all the roles asigned to
+        the user
+      example:
+        userid: 1
+        role: Admin
+        id: 0
+      properties:
+        roleid:
+          format: int64
+          type: integer
+        userid:
+          format: int64
+          type: integer
+      title: multiple role ( ADMIN, StoreManager, StoreKeeper, SalesPerson, Welder,
+        Cutter, Binder, DeliveryPerson  )
+      type: object
+      xml:
+        name: UserRole
+      x-eov-operation-handler: models/UserRole
+    Role:
+      description: This is the role table we can add new roles as per the different
+        client
+      example:
+        id: 1
+        title: Admin
+        slug: ADMIN
+        description: About the role
+        active: true/false supporting the role or not
+        createdAt: created date
+        updatedAt: current date
+        content: More about the role
+      properties:
+        id:
+          format: int64
+          type: integer
+        title:
+          type: string
+        slug:
+          type: string
+        description:
+          type: string
+        active:
+          format: int64
+          type: integer
+        content:
+          type: string
+      title: roles can be configurable
+      type: object
+      xml:
+        name: Role
+      x-eov-operation-handler: models/Role
+    Permission:
+      description: This is the permission table we can add new permission as per the
+        different client
+      example:
+        id: 1
+        title: Create User
+        slug: CREATE
+        description: About the permission
+        active: true/false supporting the permission or not
+        createdAt: created date
+        updatedAt: current date
+        content: More about the permission
+      properties:
+        id:
+          format: int64
+          type: integer
+        title:
+          type: string
+        slug:
+          type: string
+        description:
+          type: string
+        active:
+          format: int64
+          type: integer
+        content:
+          type: string
+      title: permissions can be configurable
+      type: object
+      xml:
+        name: Permission
+      x-eov-operation-handler: models/Permission
+    RolePermission:
+      description: This is the mapper between role and permission
+      example:
+        roleid: 1
+        permissionid: 1
+        createdAt: created date
+        updatedAt: current date
+      properties:
+        roleid:
+          format: int64
+          type: integer
+        permissionid:
+          format: int64
+          type: integer
+      title: 1 role have multiple permission and can be configurable
+      type: object
+      xml:
+        name: RolePermission
+      x-eov-operation-handler: models/RolePermission
+    Login_User:
+      description: A User who is purchasing from the pet store
+      example:
+        username: username
+        password: password
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+      title: Login User
+      type: object
+  securitySchemes:
+    bearerAuth:
+      bearerFormat: JWT
+      scheme: bearer
+      type: http
