@@ -14,6 +14,7 @@ const launchServer = async () => {
     logger.error('Express Server failure', error.message);
     await sql_connection.tearDown();
     await this.close();
+    console.log("Hello Error")
   }
 };
 
